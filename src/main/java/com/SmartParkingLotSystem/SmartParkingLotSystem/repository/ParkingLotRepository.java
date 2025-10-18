@@ -5,6 +5,6 @@ import com.SmartParkingLotSystem.SmartParkingLotSystem.entity.ParkingLot;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ParkingLotRepository extends JpaRepository {
+public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
     ParkingLot findByLotName(String lotName);
 }
