@@ -24,14 +24,14 @@ public class Vehicle {
     @Column(name = "vehicle_type" , nullable = false)
     private VehicleType vehicleType;
 
-    @Column(name = "colour" , nullable = false)
+    @Column(name = "colour")
     private String colour;
 
-    @Column(name = "model" , nullable = false)
+    @Column(name = "model" )
     private String model;
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ParkingTransaction> transactions;
+    private List<ParkingTransactions> transactions;
 
     @Column(name = "created_at" , nullable = false , updatable = false)
     private LocalDateTime createdAt;
