@@ -1,22 +1,17 @@
 package com.SmartParkingLotSystem.SmartParkingLotSystem.models.dto;
 
 import com.SmartParkingLotSystem.SmartParkingLotSystem.models.enums.VehicleType;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class CheckInRequest {
-    @NotBlank(message = "License plate is required")
+public class VehicleDTO {
+    private Long id;
     private String licensePlate;
-
-    @NotNull(message = "Vehicle type is required")
     private VehicleType vehicleType;
-
     private String colour;
-
     private String model;
 }
