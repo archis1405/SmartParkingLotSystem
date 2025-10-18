@@ -20,4 +20,7 @@ public interface ParkingSpotRepository extends JpaRepository<ParkingSpot,Long> {
 
     @Query("SELECT COUNT(ps) FROM ParkingSpot ps WHERE ps.floor.id = :floorId AND ps.status = :status")
     Long countAvailableSpots(@Param("floorId") Long floorId , @Param("status") ParkingSpotStatus status);
+
+    @Query("SELECT ps FROM ParkingSpot ps WHERE ps.currentVehicle.id = :vehicleId")
+    Optional<ParkingSpot> findSpotByCurrentVehicle(@Param("vehicleId") Long vehicleId);
 }
