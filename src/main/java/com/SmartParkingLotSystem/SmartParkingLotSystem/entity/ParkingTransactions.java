@@ -64,6 +64,12 @@ public class ParkingTransactions {
     protected void onCreate(){
         createdAt=LocalDateTime.now();
         updatedAt=LocalDateTime.now();
+        if(transactionStatus==null){
+            transactionStatus=TransactionStatus.ONGOING;
+        }
+        if(paymentStatus==null){
+            paymentStatus=PaymentStatus.PENDING;
+        }
     }
 
     @PreUpdate
