@@ -45,6 +45,9 @@ public class ParkingSpot {
     protected void onCreate(){
         createdAt=LocalDateTime.now();
         updatedAt=LocalDateTime.now();
+        if(status==null){
+            status=ParkingSpotStatus.AVAILABLE;
+        }
     }
 
     protected void onUpdate(){
