@@ -19,4 +19,7 @@ public interface ParkingTransactionRepository extends JpaRepository<ParkingTrans
 
     @Query("SELECT pt FROM ParkingTransactions pt WHERE pt.checkInTime BETWEEN :startTime AND :endTime")
     List<ParkingTransactions> findTransactionsByDateRange(@Param("startTime")LocalDateTime startTime , @Param("endTime") LocalDateTime endTime);
+
+    @Query("SELECT pt FROM ParkingTransactions pt WHERE pt.vehicle.id = :vehicleId ORDER BY pt.checkInTime DESC")
+    List<ParkingTransactions> findTransactionsByVehicle(@Param("vehicleId") Long VehicleId);
 }
