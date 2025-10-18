@@ -65,7 +65,7 @@ public class ParkingTransactions {
         createdAt=LocalDateTime.now();
         updatedAt=LocalDateTime.now();
         if(transactionStatus==null){
-            transactionStatus=TransactionStatus.ONGOING;
+            transactionStatus=TransactionStatus.ACTIVE;
         }
         if(paymentStatus==null){
             paymentStatus=PaymentStatus.PENDING;
