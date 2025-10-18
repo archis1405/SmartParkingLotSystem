@@ -10,5 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CheckInRequest {
+    @NotBlank(message = "License plate is required")
+    private String licensePlate;
 
+    @NotNull(message = "Vehicle type is required")
+    private String vehicleType;
+
+    private String colour;
+
+    private String model;
 }
