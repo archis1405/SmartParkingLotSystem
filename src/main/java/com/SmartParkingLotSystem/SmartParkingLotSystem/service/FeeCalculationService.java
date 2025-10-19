@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 public interface FeeCalculationService {
     BigDecimal calculateFee(ParkingTransactions transactions);
     BigDecimal calculateEstimatedFee(Long durationMinutes , String vehicleType);
-    BigDecimal applyDiscount(BigDecimal baseFee, String discountMinutes);
+    BigDecimal applyDiscount(BigDecimal baseFee, Long durationMinutes);
 }
