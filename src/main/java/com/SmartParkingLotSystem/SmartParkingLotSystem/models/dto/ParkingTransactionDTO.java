@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ParkingTransactionDTO {
     private Long id;
-    private String LicensePlate;
+    private String licensePlate;
     private String spotNumber;
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
