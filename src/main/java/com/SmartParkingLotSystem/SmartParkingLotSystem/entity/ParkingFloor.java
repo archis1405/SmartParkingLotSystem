@@ -26,7 +26,7 @@ public class ParkingFloor {
     @Column(name="total_spots", nullable = false)
     private Integer totalSpots;
 
-    @OneToMany(mappedBy = "parkingFloor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "floor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ParkingSpot> spots;
 
     @Column(name="created_at", nullable = false, updatable = false)
