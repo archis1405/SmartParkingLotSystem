@@ -50,6 +50,7 @@ public class ParkingSpot {
         }
     }
 
+    @PreUpdate
     protected void onUpdate(){
         updatedAt=LocalDateTime.now();
     }
