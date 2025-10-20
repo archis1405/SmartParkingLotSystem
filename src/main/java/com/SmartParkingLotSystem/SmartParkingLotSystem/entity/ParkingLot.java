@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
-@Table(name = "parking_lot")
+@Table(name = "parking_lot" , indexes = {
+        @Index(name = "idx_lot_name" , columnList = "lot_name")})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
