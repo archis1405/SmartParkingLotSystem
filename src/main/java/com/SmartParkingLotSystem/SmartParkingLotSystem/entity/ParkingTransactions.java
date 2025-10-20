@@ -31,19 +31,19 @@ public class ParkingTransactions {
     @Column(name="check_in_time", nullable = false)
     private LocalDateTime checkInTime;
 
-    @Column(name="check_out_time",nullable = false)
+    @Column(name="check_out_time")
     private LocalDateTime checkOutTime;
 
-    @Column(name="duration_in_minutes", nullable = false)
+    @Column(name="duration_in_minutes")
     private Long durationInMinutes;
 
-    @Column(name = "base_fee", nullable = false , precision = 10 , scale = 2)
+    @Column(name = "base_fee", precision = 10 , scale = 2 , nullable = true)
     private BigDecimal baseFee;
 
-    @Column(name = "discount_amount", nullable = false , precision = 10 , scale = 2)
+    @Column(name = "discount_amount", precision = 10 , scale = 2 , nullable = true)
     private BigDecimal discountAmount;
 
-    @Column(name = "total_fee", nullable = false , precision = 10 , scale = 2)
+    @Column(name = "total_fee", precision = 10 , scale = 2 , nullable = true)
     private BigDecimal totalFee;
 
     @Enumerated(EnumType.STRING)
@@ -57,7 +57,7 @@ public class ParkingTransactions {
     @Column(name="created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name="updated_at", nullable = false)
+    @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist

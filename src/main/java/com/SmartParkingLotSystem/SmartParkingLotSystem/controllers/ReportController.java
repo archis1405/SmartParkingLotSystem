@@ -40,7 +40,7 @@ public class ReportController {
 
         return ResponseEntity.ok(report);
     }
-
+    @GetMapping("/occupancy")
     public ResponseEntity<HashMap<String , Object>> getOccupancyReport(){
         log.info("Generating occupancy report");
         HashMap<String , Object> stats = reportService.getOccupancyReport();

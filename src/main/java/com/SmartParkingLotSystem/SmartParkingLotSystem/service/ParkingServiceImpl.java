@@ -113,11 +113,18 @@ public class ParkingServiceImpl implements ParkingService{
     }
 
     private ParkingTransactionDTO convertToDTO(ParkingTransactions transactions){
-        return ParkingTransactionDTO.builder().id(transactions.getId()).licensePlate(transactions.getVehicle().getLicensePlate()).
-                spotNumber(transactions.getParkingSpot().getSpotNumber()).checkInTime(transactions.getCheckInTime()).
-                checkOutTime(transactions.getCheckOutTime()).durationMinutes(transactions.getDurationInMinutes()).
-                baseFee(transactions.getBaseFee()).discountAmount(transactions.getDiscountAmount()).
-                totalFee(transactions.getTotalFee()).transactionStatus(transactions.getTransactionStatus()).
-                paymentStatus(transactions.getPaymentStatus()).build();
+        return ParkingTransactionDTO.builder()
+                .id(transactions.getId())
+                .licensePlate(transactions.getVehicle().getLicensePlate())
+                .spotNumber(transactions.getParkingSpot().getSpotNumber())
+                .checkInTime(transactions.getCheckInTime())
+                .checkOutTime(transactions.getCheckOutTime())
+                .durationMinutes(transactions.getDurationInMinutes())
+                .baseFee(transactions.getBaseFee())
+                .discountAmount(transactions.getDiscountAmount())
+                .totalFee(transactions.getTotalFee())
+                .transactionStatus(transactions.getTransactionStatus())
+                .paymentStatus(transactions.getPaymentStatus())
+                .build();
     }
 }
