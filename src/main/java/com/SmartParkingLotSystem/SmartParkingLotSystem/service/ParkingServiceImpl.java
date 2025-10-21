@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -67,33 +69,60 @@ public class ParkingServiceImpl implements ParkingService{
 
     @Override
     public ParkingTransactionDTO checkOut(CheckOutRequest request) {
-        log.info("Check-out initiated for vehicle: {}" , request.getLicensePlate());
+        log.info("Check-out initiated for vehicle: {}", request.getLicensePlate());
 
-        ParkingTransactions transactions = transactionRepository.findActiveTransactionByLicensePlate(
-                request.getLicensePlate(),TransactionStatus.ACTIVE).
-                orElseThrow( () -> new VehicleNotFoundException(
-                        "No active parking for the vehicle: "+ request.getLicensePlate()));
+
+        ParkingTransactions transaction = transactionRepository
+                .findActiveTransactionByLicensePlate(request.getLicensePlate(), TransactionStatus.ACTIVE)
+                .orElseThrow(() -> new VehicleNotFoundException(
+                        "No active parking found for vehicle: " + request.getLicensePlate()));
+
 
         LocalDateTime checkOutTime = LocalDateTime.now();
+        long durationMinutes = ChronoUnit.MINUTES.between(
+                transaction.getCheckInTime(), checkOutTime);
 
-        long durationMinutes = java.time.temporal.ChronoUnit.MINUTES.between(transactions.getCheckInTime() , checkOutTime);
+        log.info("Vehicle: {}, Duration: {} minutes", request.getLicensePlate(), durationMinutes);
 
-        transactions.setCheckOutTime(checkOutTime);
-        transactions.setDurationInMinutes(durationMinutes);
 
-        feeCalculationService.calculateFee(transactions);
+        transaction.setCheckOutTime(checkOutTime);
+        transaction.setDurationInMinutes(durationMinutes);
 
-        transactions.setTransactionStatus(TransactionStatus.COMPLETED);
-        transactions.setPaymentStatus(PaymentStatus.COMPLETED);
 
-        ParkingTransactions completedTransaction = transactionRepository.save(transactions);
+        try {
+            BigDecimal totalFee = feeCalculationService.calculateFee(transaction);
+            log.info("Fee calculation complete: Base={}, Discount={}, Total={}",
+                    transaction.getBaseFee(),
+                    transaction.getDiscountAmount(),
+                    totalFee);
 
-        spotAllocationService.releaseSpot(transactions.getParkingSpot().getId());
 
-        log.info("Vehicle {} checked out successfully . Duration: {} minutes, Fee: {}",
-                request.getLicensePlate() , durationMinutes , transactions.getTotalFee());
+            if (totalFee == null || transaction.getBaseFee() == null) {
+                throw new RuntimeException("Fee calculation failed - fees are null");
+            }
 
-        return convertToDTO(completedTransaction);
+        } catch (Exception e) {
+            log.error("ERROR in fee calculation for vehicle: {}", request.getLicensePlate(), e);
+
+            transaction.setBaseFee(BigDecimal.ZERO);
+            transaction.setDiscountAmount(BigDecimal.ZERO);
+            transaction.setTotalFee(BigDecimal.ZERO);
+        }
+
+
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setPaymentStatus(PaymentStatus.COMPLETED);
+
+
+        ParkingTransactions savedTransaction = transactionRepository.save(transaction);
+
+
+        spotAllocationService.releaseSpot(transaction.getParkingSpot().getId());
+
+        log.info("Checkout complete - Vehicle: {}, Fee: {}",
+                request.getLicensePlate(), savedTransaction.getTotalFee());
+
+        return convertToDTO(savedTransaction);
     }
 
     @Override

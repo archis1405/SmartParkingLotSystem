@@ -22,21 +22,65 @@ public class FeeCalculationServiceImpl implements FeeCalculationService{
 
     @Override
     public BigDecimal calculateFee(ParkingTransactions transactions) {
-        log.info("Calculating fee for transaction id: {}" , transactions.getId());
+        log.info("Starting fee calculation for transaction: {}", transactions.getId());
 
-        if(transactions.getDurationInMinutes() == null || transactions.getDurationInMinutes()<=0){
+        // Validate duration
+        if (transactions.getDurationInMinutes() == null || transactions.getDurationInMinutes() <= 0) {
+            log.warn("Duration is null or zero, setting fee to 0");
+            transactions.setBaseFee(BigDecimal.ZERO);
+            transactions.setDiscountAmount(BigDecimal.ZERO);
+            transactions.setTotalFee(BigDecimal.ZERO);
             return BigDecimal.ZERO;
         }
 
-        FeeStructure feeStructure = feeStructureRepository.findFirstByIsActiveTrueOrderByCreatedAtDesc().orElse(createDefaultFeeStructure());
+        log.info("Duration: {} minutes", transactions.getDurationInMinutes());
 
+        // Get active fee structure OR create default
+        FeeStructure feeStructure = feeStructureRepository
+                .findFirstByIsActiveTrueOrderByCreatedAtDesc()
+                .orElseGet(() -> {
+                    log.warn("No active fee structure found, creating default");
+                    return createDefaultFeeStructure();
+                });
+
+        log.info("Using fee structure: {} with hourly rate: {}",
+                feeStructure.getName(), feeStructure.getHourlyRate());
+
+        // Calculate base fee
         double durationHours = transactions.getDurationInMinutes() / 60.0;
         double vehicleMultiplier = transactions.getVehicle().getVehicleType().getFeeMultiplier();
 
-        BigDecimal estimatedFee = feeStructure.getHourlyRate().multiply(BigDecimal.valueOf(durationHours)).
-                multiply(BigDecimal.valueOf(vehicleMultiplier)).setScale(2, RoundingMode.HALF_UP);
+        log.info("Calculation: {} hours × ${} × {} multiplier",
+                durationHours, feeStructure.getHourlyRate(), vehicleMultiplier);
 
-        return estimatedFee;
+        BigDecimal baseFee = feeStructure.getHourlyRate()
+                .multiply(BigDecimal.valueOf(durationHours))
+                .multiply(BigDecimal.valueOf(vehicleMultiplier))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        log.info("Base fee calculated: {}", baseFee);
+        transactions.setBaseFee(baseFee);
+
+        // Apply discount if eligible
+        BigDecimal discount = applyDiscount(baseFee, transactions.getDurationInMinutes());
+        log.info("Discount applied: {}", discount);
+        transactions.setDiscountAmount(discount);
+
+        // Calculate total fee
+        BigDecimal totalFee = baseFee.subtract(discount);
+
+        // Apply daily cap if configured
+        if (feeStructure.getDailyCap() != null && totalFee.compareTo(feeStructure.getDailyCap()) > 0) {
+            log.info("Daily cap applied: {} -> {}", totalFee, feeStructure.getDailyCap());
+            totalFee = feeStructure.getDailyCap();
+        }
+
+        transactions.setTotalFee(totalFee);
+
+        log.info("Final fee - Base: {}, Discount: {}, Total: {}",
+                baseFee, discount, totalFee);
+
+        return totalFee;
     }
 
     @Override
